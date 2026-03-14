@@ -45,6 +45,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          cd
           gh release create release-${{ github.event.inputs.release_tag }} `
             --title "${{ github.event.inputs.release_name }}" `
             --notes "${{ github.event.inputs.release_body }}" `
