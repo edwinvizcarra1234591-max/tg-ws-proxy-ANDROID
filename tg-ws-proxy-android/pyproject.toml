@@ -7,12 +7,11 @@ url = "https://github.com/Flowseal/tg-ws-proxy"
 license.file = "LICENSE"
 author = "ShadowLev"
 author_email = "salmin.leva@gmail.com"
+icon = "icons/icon"
 
 [tool.briefcase.app.tg-ws-proxy-android]
 formal_name = "Telegram WS Proxy for Android"
 description = "WebSocket proxy for Telegram based on Flowseal's solution"
-long_description = """More details about the app should go here.
-"""
 sources = [
     "src/tg_ws_proxy_android",
 ]
