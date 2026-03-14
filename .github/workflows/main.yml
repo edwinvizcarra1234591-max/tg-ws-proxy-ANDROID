@@ -19,15 +19,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-      
       - name: Update Android build
         run: |
           venv\Scripts\activate
           briefcase update android
+
+      - name: Test venv activation
+        run: |
+          python --version
       
       - name: Build Android
         run: |
