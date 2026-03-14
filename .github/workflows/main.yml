@@ -43,4 +43,4 @@ jobs:
           gh release create release-${{ github.event.inputs.release_tag }} `
             --title "${{ github.event.inputs.release_name }}" `
             --notes "${{ github.event.inputs.release_body }}" `
-            ./tg-ws-proxy-android/build/tg-ws-proxy-android/android/gradle/app/build/outputs/apk/debug/app-debug.apk
+            ./build/tg-ws-proxy-android/android/gradle/app/build/outputs/apk/debug/app-debug.apk
