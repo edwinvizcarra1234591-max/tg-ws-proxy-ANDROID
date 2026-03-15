@@ -191,7 +191,7 @@ accent_color = "#005DC4"
 splash_background_color = "#212933"
 base_theme = "Theme.Material3.DayNight"
 build_gradle_dependencies = [
-    "com.google.android.material:material:1.14.0",
+    "com.google.android.material:material:1.13.0",
     "androidx.core:core:1.9.0", "androidx.appcompat:appcompat:1.6.1"
 ]
 
