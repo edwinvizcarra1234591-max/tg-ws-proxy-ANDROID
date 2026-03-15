@@ -125,13 +125,23 @@ class TelegramWSProxyforAndroid(toga.App):
         show the main window.
         """
         port_label = toga.Label("Порт",font_size=9,color="#FFF")
-        port_inp = toga.TextInput(validators=[validators.Integer(error_message="Port should be a number from 1-65535", allow_empty=False), lambda x: None if 0 < int(x) < 65536 else "Port should be a number from 1-65535"],margin_bottom=20, on_change=self.apply_port)
+        port_inp = toga.TextInput(validators=[validators.Integer(error_message="Port should be a number from 1-65535", allow_empty=False), lambda x: None if 0 < int(x) < 65536 else "Port should be a number from 1-65535"],margin_bottom=20,color="white", on_change=self.apply_port)
         port_inp.value = str(self.port)
         dcip_label = toga.Label("Список DC:IP (разделяется \";\")",font_size=9,color="#FFF")
-        dcip_inp = toga.TextInput(validators=[validators.Contains(substring=":", error_message="DC IP is in format of DC:IP;DC:IP;..etc.", allow_empty=False)], on_change=self.apply_dcip,margin_bottom=20)
+        dcip_inp = toga.TextInput(validators=[validators.Contains(substring=":", error_message="DC IP is in format of DC:IP;DC:IP;..etc.", allow_empty=False)], on_change=self.apply_dcip,margin_bottom=20,color="white")
         dcip_inp.value = ";".join(self.dc_ip)
         host_label = toga.Label("IP хоста",font_size=9,color="#FFF")
-        host_inp = toga.TextInput(validators=[validators.MatchRegex(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}", allow_empty = False, error_message="Host IP should be 4 numbers between 1-255 (0.0.0.0 to listen on all hosts)"), lambda x: self.met([0 <= int(y) <= 255  for y in x.split('.')], "Host IP should be 4 numbers between 1-255 (0.0.0.0 to listen on all hosts)")], on_change=self.apply_host,margin_bottom=20)
+        host_inp = toga.TextInput(
+            validators=[
+                validators.MatchRegex(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}", 
+                allow_empty = False, 
+                error_message="Host IP should be 4 numbers between 1-255 (0.0.0.0 to listen on all hosts)"), 
+                lambda x: self.met([0 <= int(y) <= 255  for y in x.split('.')], "Host IP should be 4 numbers between 1-255 (0.0.0.0 to listen on all hosts)")
+            ],
+            on_change=self.apply_host, 
+            margin_bottom=20, 
+            color="white"
+        )
         host_inp.value = "127.0.0.1"
         start_stop_btn = toga.Button(text=f"{'ВЫКЛЮЧИТЬ' if self.proxy_launched else 'ВКЛЮЧИТЬ'}", on_press=do_proxy_stuff,margin_bottom=20,background_color="#003573",color="#FFF")
         connect_btn = toga.Button(text="Подключиться в Telegram", on_press=lambda _: webbrowser.open(f"tg://socks?server={self.host}&port={self.port}"),background_color="#003573",color="#FFF")
