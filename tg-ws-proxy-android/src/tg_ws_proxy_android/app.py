@@ -12,10 +12,11 @@ import webbrowser
 import tg_ws_proxy_android.proxy_backend.tg_ws_proxy as backend
 try:
     from android.app import NotificationChannel, NotificationManager
-    from android.content import Context
+    from android.content import Context, Intent
     from android import Manifest
     from androidx.core.app import ActivityCompat, NotificationCompat
     from androidx.core.content import ContextCompat
+    from android.net import Uri
 except (ImportError, ModuleNotFoundError):
     isAndroid = False
     print("fuck no android")
@@ -93,6 +94,15 @@ class TelegramWSProxyforAndroid(toga.App):
         else:
             print("Разрешение уже получено")
     def startup(self):
+        def openproxyconn(_):
+            url = f"https://t.me/socks?server={'127.0.0.1' if self.host == '0.0.0.0' else self.host}&port={self.port}"
+            if isAndroid:
+                uri = Uri.parse(url)
+                intent = Intent(Intent.ACTION_VIEW, uri)
+                self._impl.native.startActivity(intent)
+            else:
+                webbrowser.open(url)
+
         async def do_proxy_stuff(btn):
             if not self.proxy_launched:
                 self.apply_dcip(dcip_inp)
@@ -144,7 +154,7 @@ class TelegramWSProxyforAndroid(toga.App):
         )
         host_inp.value = "127.0.0.1"
         start_stop_btn = toga.Button(text=f"{'ВЫКЛЮЧИТЬ' if self.proxy_launched else 'ВКЛЮЧИТЬ'}", on_press=do_proxy_stuff,margin_bottom=20,background_color="#003573",color="#FFF")
-        connect_btn = toga.Button(text="Подключиться в Telegram", on_press=lambda _: webbrowser.open(f"tg://socks?server={self.host}&port={self.port}"),background_color="#003573",color="#FFF")
+        connect_btn = toga.Button(text="Подключиться в Telegram", on_press=openproxyconn,background_color="#003573",color="#FFF")
         main_box = toga.Column(background_color="#212933")
 
         #subprocess.run()
