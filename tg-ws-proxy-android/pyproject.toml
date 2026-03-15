@@ -160,6 +160,10 @@ flatpak_runtime_version = "48"
 flatpak_sdk = "org.gnome.Sdk"
 
 [tool.briefcase.app.tg-ws-proxy-android.windows]
+primary_color = "#27A7E8"
+primary_color_dark = "#003573"
+accent_color = "#005DC4"
+splash_background_color = "#212933"
 requires = [
     "toga-winforms~=0.5.0",
     "cryptography"
@@ -181,10 +185,13 @@ requires = [
 
 permission."android.permission.POST_NOTIFICATIONS" = true
 permission."android.permission.FOREGROUND_SERVICE" = true
-
-base_theme = "Theme.MaterialComponents.Light.DarkActionBar"
+primary_color = "#27A7E8"
+primary_color_dark = "#003573"
+accent_color = "#005DC4"
+splash_background_color = "#212933"
+base_theme = "Theme.Material3.DayNight"
 build_gradle_dependencies = [
-    "com.google.android.material:material:1.13.0",
+    "com.google.android.material:material:1.14.0",
     "androidx.core:core:1.9.0", "androidx.appcompat:appcompat:1.6.1"
 ]
 

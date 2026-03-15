@@ -3,16 +3,17 @@ WebSocket proxy for Telegram, based on Flowseal's solution
 """
 
 isAndroid = True
+requiresPermission = True
 
 import toga
 from toga import validators
 from concurrent.futures import Future
+import webbrowser
 import tg_ws_proxy_android.proxy_backend.tg_ws_proxy as backend
 try:
     from android.app import NotificationChannel, NotificationManager
     from android.content import Context
     from android import Manifest
-    from android.content.pm import PackageManager
     from androidx.core.app import ActivityCompat, NotificationCompat
     from androidx.core.content import ContextCompat
 except (ImportError, ModuleNotFoundError):
@@ -20,6 +21,11 @@ except (ImportError, ModuleNotFoundError):
     print("fuck no android")
 
 if isAndroid:
+    from android.os import Build
+    if Build.VERSION.SDK_INT < 33:
+        requiresPermission = False
+    else:
+        from android.content.pm import PackageManager
     print("android lets fuckin gooo")
 
 class SimpleNotificationService:
@@ -111,39 +117,42 @@ class TelegramWSProxyforAndroid(toga.App):
                         self.service.stop()
                         self.service = None
                     print("PROXY OFF")
-            btn.text=f"{'Turn proxy OFF' if self.proxy_launched else 'Turn proxy ON'}"
+            btn.text=f"{'ВЫКЛЮЧИТЬ' if self.proxy_launched else 'ВКЛЮЧИТЬ'}"
         """Construct and show the Toga application.
 
         Usually, you would add your application to a main content box.
         We then create a main window (with a name matching the app), and
         show the main window.
         """
-        port_label = toga.Label("Port",font_size=9)
+        port_label = toga.Label("Порт",font_size=9,color="#FFF")
         port_inp = toga.TextInput(validators=[validators.Integer(error_message="Port should be a number from 1-65535", allow_empty=False), lambda x: None if 0 < int(x) < 65536 else "Port should be a number from 1-65535"],margin_bottom=20, on_change=self.apply_port)
         port_inp.value = str(self.port)
-        dcip_label = toga.Label("DC:IP list (separated by \";\")",font_size=9)
+        dcip_label = toga.Label("Список DC:IP (разделяется \";\")",font_size=9,color="#FFF")
         dcip_inp = toga.TextInput(validators=[validators.Contains(substring=":", error_message="DC IP is in format of DC:IP;DC:IP;..etc.", allow_empty=False)], on_change=self.apply_dcip,margin_bottom=20)
         dcip_inp.value = ";".join(self.dc_ip)
-        host_label = toga.Label("Host IP",font_size=9)
+        host_label = toga.Label("IP хоста",font_size=9,color="#FFF")
         host_inp = toga.TextInput(validators=[validators.MatchRegex(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}", allow_empty = False, error_message="Host IP should be 4 numbers between 1-255 (0.0.0.0 to listen on all hosts)"), lambda x: self.met([0 <= int(y) <= 255  for y in x.split('.')], "Host IP should be 4 numbers between 1-255 (0.0.0.0 to listen on all hosts)")], on_change=self.apply_host,margin_bottom=20)
         host_inp.value = "127.0.0.1"
-        start_stop_btn = toga.Button(text=f"{'Turn proxy OFF' if self.proxy_launched else 'Turn proxy ON'}", on_press=do_proxy_stuff)
-        main_box = toga.Column(margin=20)
+        start_stop_btn = toga.Button(text=f"{'ВЫКЛЮЧИТЬ' if self.proxy_launched else 'ВКЛЮЧИТЬ'}", on_press=do_proxy_stuff,margin_bottom=20,background_color="#003573",color="#FFF")
+        connect_btn = toga.Button(text="Подключиться в Telegram", on_press=lambda _: webbrowser.open(f"tg://socks?server={self.host}&port={self.port}"),background_color="#003573",color="#FFF")
+        main_box = toga.Column(background_color="#212933")
 
         #subprocess.run()
-        
-        main_box.add(dcip_label)
-        main_box.add(dcip_inp)
-        main_box.add(host_label)
-        main_box.add(host_inp)
-        main_box.add(port_label)
-        main_box.add(port_inp)
-        main_box.add(start_stop_btn)
+        padd_box = toga.Column(margin=20)
+        padd_box.add(dcip_label)
+        padd_box.add(dcip_inp)
+        padd_box.add(host_label)
+        padd_box.add(host_inp)
+        padd_box.add(port_label)
+        padd_box.add(port_inp)
+        padd_box.add(start_stop_btn)
+        padd_box.add(connect_btn)
+        main_box.add(padd_box)
         self.main_window = toga.MainWindow(title=self.formal_name)
         self.main_window.content = main_box
         self.main_window.show()
 
-        if isAndroid:
+        if isAndroid and requiresPermission:
             self.check_notifications_permission()
 
 
