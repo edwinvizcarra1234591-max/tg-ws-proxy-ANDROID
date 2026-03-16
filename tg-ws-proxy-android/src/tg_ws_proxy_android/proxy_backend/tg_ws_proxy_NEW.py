@@ -14,7 +14,7 @@ from typing import Dict, List, Optional, Set, Tuple
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 
-call = None
+appclass = None
 
 DEFAULT_PORT = 1080
 log = logging.getLogger('tg-ws-proxy')
@@ -80,6 +80,8 @@ _ws_blacklist: Set[Tuple[int, bool]] = set()
 _dc_fail_until: Dict[Tuple[int, bool], float] = {}
 _DC_FAIL_COOLDOWN = 60.0  # seconds
 
+
+STOP_EVENT = asyncio.Event()
 
 _ssl_ctx = ssl.create_default_context()
 _ssl_ctx.check_hostname = False
@@ -1086,7 +1088,7 @@ async def _run(port: int, dc_opt: Dict[int, Optional[str]],
         try:
             await server.serve_forever()
         except asyncio.CancelledError:
-            call()
+            appclass.stop_proxy()
     _server_instance = None
 
 
@@ -1141,7 +1143,7 @@ def main(argss):
     )
 
     try:
-        return asyncio.create_task(_run(args.port, dc_opt, host=args.host))
+        return asyncio.create_task(_run(args.port, dc_opt, host=args.host, stop_event=STOP_EVENT))
     except KeyboardInterrupt:
         log.info("Shutting down. Final stats: %s", _stats.summary())
 

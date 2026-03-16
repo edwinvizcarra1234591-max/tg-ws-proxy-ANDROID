@@ -75,8 +75,7 @@ class TelegramWSProxyforAndroid(toga.App):
             if isAndroid:
                 self.service.stop()
                 self.service = None
-            print("PROXY OFF")     
-    backend.call = stop_proxy
+            print("PROXY OFF")
     def met(self, bool_iter, ifnot):
         for b in bool_iter:
             if not b:
@@ -105,6 +104,7 @@ class TelegramWSProxyforAndroid(toga.App):
         else:
             print("Разрешение уже получено")
     def startup(self):
+        backend.appclass = self
         def openproxyconn(_):
             url = f"https://t.me/socks?server={'127.0.0.1' if self.host == '0.0.0.0' else self.host}&port={self.port}"
             if isAndroid:
