@@ -9,7 +9,7 @@ import toga
 from toga import validators
 from concurrent.futures import Future
 import webbrowser
-import tg_ws_proxy_android.proxy_backend.tg_ws_proxy as backend
+import tg_ws_proxy_android.proxy_backend.tg_ws_proxy_NEW as backend
 try:
     from android.app import NotificationChannel, NotificationManager
     from android.content import Context, Intent
@@ -66,6 +66,17 @@ class TelegramWSProxyforAndroid(toga.App):
     proxy = None
     service = None
     completion_future = Future()
+    def stop_proxy(self):
+        if self.proxy:
+            backend.STOP_EVENT.set()
+            self.proxy = None
+            self.proxy_launched = False
+            backend.STOP_EVENT.clear()
+            if isAndroid:
+                self.service.stop()
+                self.service = None
+            print("PROXY OFF")     
+    backend.call = stop_proxy
     def met(self, bool_iter, ifnot):
         for b in bool_iter:
             if not b:
@@ -134,13 +145,15 @@ class TelegramWSProxyforAndroid(toga.App):
         We then create a main window (with a name matching the app), and
         show the main window.
         """
-        port_label = toga.Label("Порт",font_size=9,color="#FFF")
-        port_inp = toga.TextInput(validators=[validators.Integer(error_message="Порт должен быть числом в пределах 1-65535 включительно", allow_empty=False), lambda x: None if 0 < int(x) < 65536 else "Порт должен быть числом в пределах 1-65535 включительно"],margin_bottom=20,color="white", on_change=self.apply_port)
+        port_label = toga.Label("Порт",font_size=9,color="#AAD")
+        port_inp = toga.TextInput(validators=[validators.Integer(error_message="Порт должен быть числом в пределах 1-65535 включительно", allow_empty=False), lambda x: None if 0 < int(x) < 65536 else "Порт должен быть числом в пределах 1-65535 включительно"],margin_bottom=20,color="white", on_change=self.apply_port,
+            background_color="#212933")
         port_inp.value = str(self.port)
-        dcip_label = toga.Label("Список DC:IP (разделяется \";\")",font_size=9,color="#FFF")
-        dcip_inp = toga.TextInput(validators=[validators.Contains(substring=":", error_message="Список DC-IP должен быть в формате DC:IP;DC:IP;..и т.д.", allow_empty=False)], on_change=self.apply_dcip,margin_bottom=20,color="white")
+        dcip_label = toga.Label("Список DC:IP (разделяется \";\")",font_size=9,color="#AAD")
+        dcip_inp = toga.TextInput(validators=[validators.Contains(substring=":", error_message="Список DC-IP должен быть в формате DC:IP;DC:IP;..и т.д.", allow_empty=False)], on_change=self.apply_dcip,margin_bottom=20,color="white",
+            background_color="#212933")
         dcip_inp.value = ";".join(self.dc_ip)
-        host_label = toga.Label("IP хоста",font_size=9,color="#FFF")
+        host_label = toga.Label("IP хоста",font_size=9,color="#AAD")
         host_inp = toga.TextInput(
             validators=[
                 validators.MatchRegex(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}", 
@@ -150,7 +163,8 @@ class TelegramWSProxyforAndroid(toga.App):
             ],
             on_change=self.apply_host, 
             margin_bottom=20, 
-            color="white"
+            color="white",
+            background_color="#212933"
         )
         host_inp.value = "127.0.0.1"
         start_stop_btn = toga.Button(text=f"{'ВЫКЛЮЧИТЬ' if self.proxy_launched else 'ВКЛЮЧИТЬ'}", on_press=do_proxy_stuff,margin_bottom=20,background_color="#003573",color="#FFF")
